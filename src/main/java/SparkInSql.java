@@ -1,31 +1,15 @@
 import Util.BaseZookeeper;
-import Util.DataSender;
 import Util.SparkUtil;
-import base.Base;
-import org.apache.commons.io.IOUtils;
+import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.streaming.StreamingQuery;
 import org.apache.spark.sql.streaming.StreamingQueryListener;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.data.Stat;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.spark.SparkConf;
-import parser.CreateTableParser;
-import parser.InsertSqlParser;
 import parser.SqlParser;
 import parser.SqlTree;
 
-import static Util.SparkUtil.createStreamingQuery;
-import static parser.SqlParser.parseSql;
+import java.util.Map;
 
 public class SparkInSql {
 
@@ -37,7 +21,7 @@ public class SparkInSql {
         //第一阶段
         BaseZookeeper zookeeper = new BaseZookeeper();
         zookeeper.connectZookeeper("127.0.0.1:2181");
-        String sql = BaseZookeeper.getSqlFromSource("socket");
+        String sql = BaseZookeeper.getSqlFromSource(" kafka");
         zookeeper.setData("/sqlTest", sql);
 
 

@@ -237,7 +237,7 @@ public class ImageProcessUtil {
      * 添加水印
      */
 
-    private static BufferedImage watermark(int[] image) {
+    public static BufferedImage watermark(int[] image) {
         try {
             int[] info = new int[Property.WIDTH*Property.HEIGHT];
             int[] watermark = getWatermark();

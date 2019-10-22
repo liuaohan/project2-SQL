@@ -234,6 +234,9 @@ public class BaseZookeeper implements Watcher{
             case "orcOut":
                 file = new File("src/main/resources/testOrcOutput");
                 break;
+            default:
+                file = new File("src/main/resources/testSQLFile");
+                break;
         }
         BufferedReader reader = null;
         String sql = "";

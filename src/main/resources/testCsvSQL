@@ -15,6 +15,7 @@ CREATE TABLE csvTable(
     path='filepath/csv'
 );
 
+
 create SINK console(
 )WITH(
     type='console',

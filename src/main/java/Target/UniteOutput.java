@@ -11,8 +11,6 @@ import org.apache.spark.sql.streaming.StreamingQuery;
 import org.apache.spark.sql.streaming.Trigger;
 import parser.CreateTableParser;
 import parser.InsertSqlParser;
-import sparkcl.SparkKernel;
-import sparkcl.SparkUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,40 +36,7 @@ public class UniteOutput implements BaseOutput{
             Dataset<Row> sourceTable = tablelist.get(key);
             sourceTable.createOrReplaceTempView(key);
         }
-//        Dataset<Row> result = spark.sql(querySql);
-
-
-        SparkKernel<String,Dataset<Row>> kernel2 = new SparkKernel<String, Dataset<Row>>()
-        {
-            // data
-            Dataset<Row> result;
-            String querySQL;
-//            Dataset<String> input;
-            @Override
-            public void mapParameters(String data) {
-//                input = data;
-                querySQL = data;
-                result = null;
-                setRange(Range.create(1024));
-                setExecutionModeWithoutFallback(EXECUTION_MODE.GPU);
-            }
-
-            @Override
-            public void run() {
-                result = spark.sql(querySQL);
-            }
-
-            @Override
-            public Dataset<Row> mapReturnValue(String data) {
-//                return input.groupBy("value").count();
-                return spark.sql(querySQL);
-
-            }
-
-        };
-
-
-        Dataset<Row> result = SparkUtil.genSparkCL3(querySql).mapCL3(kernel2);
+        Dataset<Row> result = spark.sql(querySql);
 
         //生成query
         StreamingQuery query = null;

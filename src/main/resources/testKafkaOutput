@@ -10,10 +10,22 @@ CREATE TABLE inputTable(
 )WITH(
     type='socket',
     host='localhost',
-    processwindow='10 seconds,5 seconds',
-    watermark='30 seconds',
-    port='9998'
+    port='9998',
+    processwindow='10 seconds,5 seconds',//slide,size
 );
+
+CREATE TABLE imputTable(
+    image String,
+    currentTime String
+)WITH(
+    type='socket',
+    host='localhost',
+    port='9998,
+    eventfield=' currentTime ',
+    eventwindow='10 seconds,5 seconds',//slide,size
+    watermark='30 seconds',//水印值与事件时间值的偏移
+);
+
 
 create SINK kafkaOut(
 )WITH(
@@ -26,3 +38,7 @@ create SINK kafkaOut(
 );
 
 insert into kafkaOut select * from inputTable;
+
+
+
+

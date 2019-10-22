@@ -122,10 +122,10 @@ public class SparkUtil {
         for(InsertSqlParser.SqlParseResult sqlParseResult : execSqlList)
         {
             String key = sqlParseResult.getTargetTable();
-//            String type = (String) sqlTree.getPreDealSinkMap().get(key).getPropMap().get("type");
-//            String upperType = SplitSql.upperCaseFirstChar(type) + "Output";
-//            BaseOutput sinkByClass = SparkUtil.getSinkByClass(upperType);
-//            streamingQuery = sinkByClass.process(spark,tablelist,preDealSinkMap.get(key), sqlParseResult);
+//          String type = (String) sqlTree.getPreDealSinkMap().get(key).getPropMap().get("type");
+//          String upperType = SplitSql.upperCaseFirstChar(type) + "Output";
+//          BaseOutput sinkByClass = SparkUtil.getSinkByClass(upperType);
+//          streamingQuery = sinkByClass.process(spark,tablelist,preDealSinkMap.get(key), sqlParseResult);
             UniteOutput uniteOutput = new UniteOutput();
             streamingQuery = uniteOutput.process(spark,tablelist,preDealSinkMap.get(key), sqlParseResult);
         }
