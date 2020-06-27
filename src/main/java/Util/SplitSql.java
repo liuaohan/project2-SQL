@@ -38,12 +38,14 @@ public class SplitSql {
 
         return tokensList;
     }
+
     //按等于号分为键值对
-    public static Map parseProp(String propsStr) {
+    public static Map<String, Object> parseProp(String propsStr) {
         String[] strs = propsStr.trim().split("'\\s*,");
-        Map<String, Object> propMap = new HashMap<>();
+        Map<String, Object> propMap = new LinkedHashMap<>();
         for (int i = 0; i < strs.length; i++) {
             List<String> ss = SplitSql.splitWithDel(strs[i], '=');
+            if(ss.size()<=0) break;
             String key = ss.get(0).trim();
             String value = ss.get(1).trim().replaceAll("'", "").trim();
             propMap.put(key, value);
@@ -53,7 +55,7 @@ public class SplitSql {
     }
 
     //获取appName
-    public static String getAppName(String appInfo){
+    public static String getAppName(String appInfo) {
         List<String> ss = SplitSql.splitWithDel(appInfo.trim(), '=');
         String appName = ss.get(1).trim().replaceAll("'", "").trim();
         return appName;
@@ -85,6 +87,7 @@ public class SplitSql {
     public static boolean isNullOrEmpty(@Nullable String string) {
         return string == null || string.length() == 0;
     }
+
     public static String upperCaseFirstChar(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
@@ -135,8 +138,6 @@ public class SplitSql {
 
         throw new RuntimeException("不支持 " + filedType + " 类型");
     }
-
-
 
 
 }

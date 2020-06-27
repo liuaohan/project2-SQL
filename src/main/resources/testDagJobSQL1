@@ -1,0 +1,51 @@
+create dag app1(
+) with(
+);
+
+create reader node1(
+    isStream = 'false',
+    url = '10.11.1.193:9092',
+    topic = 'EasyPrPart10_test3',
+    maxSize = '2097152',
+    tuple = '500',
+    offset = 'earliest'
+)WITH(
+    preNode='none'
+);
+
+create makeframe node2(
+)WITH(
+    preNode='node1'
+);
+
+create detection node3(
+    modelType='50051',
+    newPara ='0'
+)WITH(
+    preNode='node2'
+);
+
+create tracker node4(
+    param1='2'
+)WITH(
+    preNode='node3'
+);
+
+create groupby node5(
+)WITH(
+    preNode='node4'
+);
+
+create sort node6(
+)WITH(
+    preNode='node5'
+);
+
+create writer node7(
+    transform='0',
+    url='10.11.1.193:9092',
+    maxSize='2097152',
+    topic='app1output'
+)WITH(
+    preNode='node6'
+);

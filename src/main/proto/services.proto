@@ -1,0 +1,201 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "rpc";
+option java_outer_classname = "SparkGProto";
+option objc_class_prefix = "HLW";
+
+package rpc;
+
+// The greeting service definition.
+service SparkGAPI {
+
+    // 提交中间代码DAG
+    rpc SubmitDAGJob (DAGJob) returns (JobReply){}
+    rpc SubmitDAGJobByJson (DAGJobJson) returns (JobReply){}
+
+    // 下面已废弃
+
+    // Sends a job request and execute
+     rpc SubmitJob (JobRequest) returns (JobReply){}
+
+    // Sends a job request and test (don not run)
+    rpc TestJob (JobRequest) returns (JobReply){}
+
+}
+
+
+
+
+// 运行的平台
+enum PlatformType {
+    Local = 0;  // 本地Spark
+    Cluster = 1;  // 分布式Spark
+    HRM = 2;  // 课题3的调度器
+}
+
+// 算子类型
+enum NodeType {
+    Reader = 0;   // 从kafka读取数据
+    GroupBy = 1;  // 按摄像头分组
+    MakeFrame = 2;  // 产生帧图像
+
+    Detection = 3;  // yolo目标识别
+    Speed = 4;     //  车速计算
+    LPR = 5;       //  车牌检测
+
+    Sort = 6;     // 排序
+
+    Crop = 7;      // 图片剪裁
+    Fork = 8;    // 用于逻辑判断，类似switch case
+    Segmentation = 9;  //
+    Classification = 10; //
+
+    Writer = 11;   //   结果写入kafka
+
+    Tracker = 12;
+}
+
+// 数据类型
+enum DataType {
+    Integer = 0;
+    Float = 1;
+    String = 2;
+    Bytes = 3;  // 用来存储图像
+}
+
+// 数据属性
+message Attribute {
+    DataType type = 1;
+    string name = 2;
+}
+
+// DAG中的一个算子
+message Node {
+    NodeType type = 1;   // 算子类型
+    string name = 2;     // 算子名称
+    repeated string pre_node_list = 3;  // 该算子依赖的前驱节点名称列表
+    repeated string parameter_list = 4;  // 该算子的参数列表
+    repeated Attribute output_list = 5;        // 该算子的输出属性列表
+}
+
+// 一个DAG图作为一个job执行
+message DAGJob {
+    string name = 1;
+    repeated Node all_node_list = 2;
+    bool is_stream = 3;  // 执行模式："batch" or "stream"
+    float latency = 4;   // stream模式的执行延时，如1s
+    PlatformType platform = 5;  // 执行平台："Spark Local", "Spark Cluster", "HRM Cluster"
+    bool use_checkpoint = 6;   // 是否需要容错
+    bool is_test = 7; // 是否启用测试模式
+}
+
+// DAGJob的json表示
+message DAGJobJson {
+    string json = 1;
+}
+
+
+// job的执行信息
+message JobReply {
+    string compile_info = 1;
+    string compile_err_info = 2;
+    string run_info = 3;
+    string run_err_info = 4;
+}
+
+// 下面已废弃
+
+enum LanguageType {
+    Java = 0;  // recommended
+    Scala = 1;
+    Python = 2;
+    SQL = 3;
+}
+
+
+enum RunType {
+    Batch = 0;
+    Stream = 1;
+}
+
+enum TableType {
+    File = 0;
+    Kafka = 1;
+    Console = 2;
+}
+
+message JobRequest {
+    string code = 1;     // transformation of input
+    string name = 2;     // job's name
+    LanguageType language = 3;  // "Java", etc
+    bool is_stream = 4;  // "batch" or "stream"
+    PlatformType platform = 5;  // "Local", "Cluster", "HRM"
+    repeated UBTable input_list = 6;   // Job's input unbounded table list
+    UBTable output = 7;  // Job's output unbounded table
+   }
+
+message UBTable {
+    string name = 1; // table's name
+    TableType type = 2; // File or Kafka or Console
+    string URL = 3;  // Kafka's URL
+    string path = 4;  // File's path
+    string topic = 5;  // Fafka's topic
+    string schema = 6;  // tables's schema, e.g.,  "id IntegerType, time LongType, img StringType"
+    bool use_checkpoint = 7;
+ }
+
+
+/*
+天网工程的DAG案例
+{
+  "name": "skynet",
+   "all_node_list" : [
+        { "type":  Reader,
+          "name": "node1",
+          "pre_node_list": [],
+          "parameter_list": ["127.0.0.1:xxx","topic1"]  }
+       { "type":  GroupByCamera,
+          "name": "node2",
+          "pre_node_list": ["node1"],
+          "parameter_list": []  },
+       { "type":  MakeFrame,
+          "name": "node3",
+          "pre_node_list": ["node2"],
+          "parameter_list": []  },
+       { "type":  Detection,
+          "name": "node4",
+          "pre_node_list": ["node3"],
+          "parameter_list": []  },
+       { "type":  Speed,
+          "name": "node5",
+          "pre_node_list": ["node3"],
+          "parameter_list": []  },
+       { "type":  LPR,
+          "name": "node6",
+          "pre_node_list": ["node2","node3"],
+          "parameter_list": []  },
+      { "type":  Track,
+          "name": "node7",
+          "pre_node_list": ["node3"],
+          "parameter_list": []  },
+       { "type":  Writer,
+          "name": "node8",
+          "pre_node_list": ["node5],
+          "parameter_list": ["127.0.0.1:xxx","topic2"]   },
+       { "type":  Writer,
+          "name": "node9",
+          "pre_node_list": ["node6"],
+          "parameter_list": ["127.0.0.1:xxx","topic3"]   },
+      { "type":  Writer,
+          "name": "node10",
+          "pre_node_list": ["node7"],
+          "parameter_list": ["127.0.0.1:xxx","topic4"]   },
+    ],
+   "is_stream": true,
+    "latency" : 1,
+    "platform" : HRM,
+    "use_checkpoint": true
+}
+
+*/

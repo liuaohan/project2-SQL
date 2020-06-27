@@ -1,0 +1,43 @@
+create dag app2_dag (
+) with(
+);
+
+create reader node1(
+    isStream = 'false',
+    url = '10.11.1.193:9092',
+    topic = 'EasyPrPart1small       ',
+    maxSize = '2097152',
+    tuple = '500',
+    offset = 'earliest'
+)WITH(
+    preNode='none'
+);
+
+create makeframe node2(
+)WITH(
+    preNode='node1'
+);
+
+create lrp node3(
+)WITH(
+    preNode='node2'
+);
+
+create groupby node4(
+)WITH(
+    preNode='node3'
+);
+
+create sort node5(
+)WITH(
+    preNode='node4'
+);
+
+create writer node6(
+    transform='0',
+    url='10.11.1.193:9092',
+    maxSize='2097152',
+    topic='app2output'
+)WITH(
+    preNode='node5'
+);
