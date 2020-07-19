@@ -37,6 +37,16 @@ public class DagTree {
         this.appInfo = appInfo;
     }
 
+
+    public boolean contains(DagNodeResult node) {
+        for (DagNodeResult dagNodeResult : sqlTree) {
+            if (node.getName().equals(dagNodeResult.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     //储存各源表的分隔符和列属性
     public static ArrayList<String> delimiters = new ArrayList<>();
     public static ArrayList<List> columnLists = new ArrayList<>();

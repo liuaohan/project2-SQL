@@ -1,0 +1,28 @@
+CREATE TABLE reader(
+    name char,
+    isStream int,
+    url char,
+    topic char,
+    size int,
+    tuple int,
+    offset char
+);
+Insert into reader values('node1',false,'10.11.1.193:9092','EasyPrPart10_test3',2097152,500,'earliest');
+
+select  makeframe('node2'),
+        detection('node3','50051','0'),
+        tracker('node4','2')
+from reader
+group by node5
+sort by node6;
+
+
+CREATE TABLE writer(
+    name char,
+    transform char,
+    url char,
+    size int,
+    topic char
+);
+
+Insert into writer values('node7','0','10.11.1.193:9092','2097152','app1output');

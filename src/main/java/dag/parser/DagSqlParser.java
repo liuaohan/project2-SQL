@@ -37,6 +37,8 @@ public class DagSqlParser {
     //public static DagTree dagTree;
 
     public static DagTree parseSql(String sql) {
+
+        sql = TestA.sql;
         sql = sql.toLowerCase();
         sql = sql.replaceAll("--.*", "")
                 .replaceAll("\r\n", " ")

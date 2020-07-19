@@ -1,0 +1,40 @@
+CREATE TABLE reader(
+    name char,
+    isStream  char,
+    url char,
+    topic char,
+    size int,
+    tuple int,
+    offset char
+);
+Insert into reader values('node1',false,'10.11.1.193:9092','app3test',2097152,500,'earliest');
+
+select  makeframe('node2'),
+        detection('node3'),
+        crop('node4'),
+        fork('node5','cutout_cock'),
+        segmentation('node6')
+from reader
+group by node7
+sort by node8;
+
+CREATE TABLE writer1(
+    name char,
+    transform char,
+    url char,
+    size int,
+    topic char
+);
+Insert into writer values('node9','0','10.11.1.193:9092','2097152','app3output1');
+
+
+select  makeframe('node2'),
+        detection('node3'),
+        crop('node4'),
+        fork('node10','locking_plate'),
+        classification('node11')
+from reader
+group by node12
+sort by node13;
+
+Insert into writer values('node14','0','10.11.1.193:9092','2097152','app3output2');

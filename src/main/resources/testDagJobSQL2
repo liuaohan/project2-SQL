@@ -5,7 +5,7 @@ create dag app2_dag (
 create reader node1(
     isStream = 'false',
     url = '10.11.1.193:9092',
-    topic = 'EasyPrPart1small       ',
+    topic = 'EasyPrPart1small',
     maxSize = '2097152',
     tuple = '500',
     offset = 'earliest'

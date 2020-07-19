@@ -1,6 +1,8 @@
 import dag.parser.DagSqlParser;
+import dag.parser.javacc.SqlParserJC;
 import dag.result.DagNodeResult;
 import dag.result.DagTree;
+import parser.SqlParser;
 import rpc.DAGJob;
 import rpc.Node;
 
@@ -15,7 +17,7 @@ public class SparkDag {
     public static void main(String[] args) {
         StringBuffer sql = new StringBuffer();
         try {
-            File file = new File("E:\\Projects\\StructuredStreaming\\src\\main\\resources\\testDagJobSQL2");
+            File file = new File("E:\\Projects\\StructuredStreaming\\src\\main\\resources\\testDagJobSQL6");
             FileInputStream fis = new FileInputStream(file);
             BufferedInputStream bis = new BufferedInputStream(fis);
             //自定义缓冲区
@@ -26,24 +28,40 @@ public class SparkDag {
             }
             System.out.println(sql);
             //关闭的时候只需要关闭最外层的流就行了
+            System.out.println(sql);
+
+            //编译sql
+            DagTree dagTree = SqlParserJC.parseSql(sql.toString());
+            DagTree dagTree2 = DagSqlParser.parseSql(sql.toString());
+            //构建dagjob
+            DAGJob dag = buildNode(dagTree);
+            DAGJob dag2 = buildNode(dagTree2);
+            System.out.println(dag.toString());
+            //System.out.println(dag2.toString());
+            if (dag.toString().equals(dag2.toString())) {
+                System.out.println("equals");
+            } else {
+                System.out.println("Not equals");
+            }
             bis.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(sql);
 
-        //编译sql
-        DagTree dagTree = DagSqlParser.parseSql(sql.toString());
-        //构建dagjob
-        DAGJob dag = buildNode(dagTree);
     }
 
     private static DAGJob buildNode(DagTree dagTree) {
         List<Node> allNodes = new ArrayList<>();
 
+        List<String> paramsList;
         for (DagNodeResult res : dagTree.getSqlTree()) {
-            List<String> paramsList = new ArrayList(res.getParams().values());
-
+            if (res.getParams() != null && !res.getParams().isEmpty()) {
+                paramsList = new ArrayList(res.getParams().values());
+            } else if (res.getParamList() != null && !res.getParamList().isEmpty()) {
+                paramsList = new ArrayList(res.getParamList());
+            } else {
+                paramsList = new ArrayList<>();
+            }
             Node.Builder builder = Node.newBuilder();
             builder.setName(res.getName());
             builder.setType(res.getType());
@@ -56,9 +74,6 @@ public class SparkDag {
             System.out.println("");
         }
         DAGJob dag = DAGJob.newBuilder().setName(dagTree.getDagResult().getName()).addAllAllNodeList(allNodes).build();
-        System.out.println(dag);
         return dag;
     }
-
-
 }
