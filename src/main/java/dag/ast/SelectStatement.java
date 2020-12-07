@@ -13,16 +13,24 @@ public class SelectStatement implements Statement{
      */
     public String tableName;
 
+    public String intoTableName;
 
     public String group;
 
     public String sort;
 
-    public SelectStatement(List<Operation> operationList, String tableName, String group, String sort) {
+    public SelectStatement(List<Operation> operationList, String tableName, String intoTableName, String group, String sort) {
         this.operationList = operationList;
         this.tableName = tableName;
+        this.intoTableName = intoTableName;
         this.group = group;
         this.sort = sort;
+    }
+
+    public SelectStatement(List<Operation> operationList, String tableName, String intoTableName) {
+        this.operationList = operationList;
+        this.tableName = tableName;
+        this.intoTableName = intoTableName;
     }
 
     @Override

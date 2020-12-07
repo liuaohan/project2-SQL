@@ -4,7 +4,8 @@ public enum  PropertyType {
     UNKNOWN,
     INT,
     BOOL,
-    CHAR;
+    CHAR,
+    STRING;
 
     public static PropertyType typeOf(String input) {
         switch (input.toLowerCase()) {

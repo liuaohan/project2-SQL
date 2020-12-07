@@ -3,7 +3,6 @@ package Target;
 import Util.TestForeachWriter;
 import Util.VideoPlayer;
 import Util.VideoWriter;
-import com.aparapi.Range;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;

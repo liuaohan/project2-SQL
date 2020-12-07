@@ -1,5 +1,6 @@
 package dag.parser.javacc;
 
+import Util.SplitSql;
 import dag.ast.*;
 import dag.generated.DAGJobSqlParser;
 import dag.result.DagNodeResult;
@@ -8,7 +9,6 @@ import dag.result.DagTree;
 import rpc.NodeType;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.util.*;
 
 public class SqlParserJC {
@@ -18,8 +18,15 @@ public class SqlParserJC {
     private static List<String> nodeNameList = new LinkedList<>();
     private static String preNode = "none";
     private static String forkNode = "";
+    private static int nodeIndex = 1;
+    private static Map<String, DagNodeResult> writerNodes = new LinkedHashMap<>();
+    private static DagNodeResult groupByNode = new DagNodeResult();
+    private static DagNodeResult sortNode = new DagNodeResult();
+    private static List<String> tempTableName = new LinkedList<>();
+
 
     public static DagTree parseSql(String sql) {
+        init();
         List<Statement> statementList = new LinkedList<>();
         DagTree dagTree = new DagTree();
         try {
@@ -34,20 +41,35 @@ public class SqlParserJC {
                 case CREATE_TABLE:
                     parseCreateTable((CreateTableStatement) statement, dagTree);
                     break;
+                case LOAD:
+                    parseLoad((LoadStatement) statement, dagTree);
+                    break;
+                case CREATE_TEMPORARY_TABLE:
+                    parseCreateTemporaryTable((CreateTemporaryTableStatement) statement, dagTree);
+                    break;
                 case INSERT:
-                    parseInsert((InsertStatement) statement, dagTree, index++);
+                    parseInsert((InsertStatement) statement, dagTree);
                     break;
                 case SELECT:
-                    parseSelect((SelectStatement) statement, dagTree, index++);
+                    parseSelect((SelectStatement) statement, dagTree);
                     break;
             }
         }
+        //last(dagTree);
         DagResult dagResult = new DagResult();
-        dagResult.setName("app2_dag");
         dagTree.setDagResult(dagResult);
-        System.out.println(readerParam);
-        System.out.println(writerParam);
         return dagTree;
+    }
+
+
+    public static void init() {
+        readerParam = new LinkedList<>();
+        writerParam = new LinkedList<>();
+        nodeNameList = new LinkedList<>();
+        preNode = "none";
+        forkNode = "";
+        nodeIndex = 1;
+        writerNodes = new HashMap<>();
     }
 
     private static void parseCreateTable(CreateTableStatement statement, DagTree dagTree) {
@@ -64,9 +86,49 @@ public class SqlParserJC {
         }
     }
 
-    private static void parseInsert(InsertStatement statement, DagTree dagTree, int index) {
+    private static void parseCreateTemporaryTable(CreateTemporaryTableStatement statement, DagTree dagTree) {
+        List<Object> fields = new LinkedList<>();
+
+        if (statement.tableName.contains("reader")) {
+            fields = readerParam;
+        } else if (statement.tableName.contains("writer")) {
+            fields = writerParam;
+        }
+
+        tempTableName.add(statement.tableName);
+    }
+
+    private static void parseLoad(LoadStatement statement, DagTree dagTree) {
+        if (statement.tableName.contains("reader")) {
+            SimpleExpression properties = statement.source;
+            String prop = properties.value.toString().split("\\/\\/")[1];
+            List<String> valueList = SplitSql.splitWithDel(prop, ',');
+            properties.value.toString().split(",");
+            DagNodeResult res = new DagNodeResult();
+
+            res.setName(getNodeName());
+            res.setParamList(valueList);
+            res.setPreNode(preNode);
+            preNode = res.getName();
+            res.setType(getNodeType(statement.tableName));
+            dagTree.getSqlTree().add(res);
+        } else {
+            SimpleExpression properties = statement.source;
+            String prop = properties.value.toString().split("\\/\\/")[1];
+            List<String> valueList = SplitSql.splitWithDel(prop, ',');
+            properties.value.toString().split(",");
+            DagNodeResult res = new DagNodeResult();
+
+            res.setParamList(valueList);
+            res.setPreNode(preNode);
+            res.setType(getNodeType(statement.tableName));
+            writerNodes.put(statement.tableName, res);
+        }
+    }
+
+    private static void parseInsert(InsertStatement statement, DagTree dagTree) {
         List<SimpleExpression> propertyList = statement.valueList;
-        List<Object> valueList = new LinkedList<>();
+        List<String> valueList = new LinkedList<>();
         DagNodeResult res = new DagNodeResult();
         for (SimpleExpression exp : propertyList) {
             PropertyType type = exp.type;
@@ -83,20 +145,17 @@ public class SqlParserJC {
         System.out.println(valueList);
     }
 
-    private static void parseSelect(SelectStatement statement, DagTree dagTree, int index) {
+    private static void parseSelect(SelectStatement statement, DagTree dagTree) {
         List<Operation> operationList = statement.operationList;
         DagNodeResult node;
+        String lastprenode = preNode;
         for (Operation op : operationList) {
+            List<String> valueList = new LinkedList<>();
             node = new DagNodeResult();
-            List<SimpleExpression> propertyList = op.valueList;
-            List<Object> valueList = new LinkedList<>();
-            for (SimpleExpression exp : propertyList) {
-                PropertyType type = exp.type;
-                String value = String.valueOf(exp.value);
-                valueList.add(value);
+            if (op.opValue.value != null) {
+                valueList = SplitSql.splitWithDel(op.opValue.value.toString(), ',');
             }
-            node.setName(String.valueOf(valueList.get(0)));
-            valueList.remove(0);
+            node.setName(getNodeName());
             node.setType(getNodeType(op.name));
             node.setPreNode(preNode);
             preNode = node.getName();
@@ -108,18 +167,73 @@ public class SqlParserJC {
         }
 
         if (statement.group != null && statement.group.length() > 0) {
-            node = new DagNodeResult();
-            node.setName(statement.group);
-            node.setType(NodeType.GroupBy);
-            node.setPreNode(preNode);
-            preNode = node.getName();
-            dagTree.getSqlTree().add(node);
+            groupByNode = new DagNodeResult();
+            groupByNode.setType(NodeType.GroupBy);
         }
 
         if (statement.sort != null && statement.sort.length() > 0) {
+            sortNode = new DagNodeResult();
+            sortNode.setType(NodeType.Sort);
+        }
+
+        if (tempTableName.contains(statement.tableName)) {
             node = new DagNodeResult();
-            node.setName(statement.sort);
-            node.setType(NodeType.Sort);
+
+            if (groupByNode != null) {
+                node.setName(getNodeName());
+                node.setPreNode(preNode);
+                preNode = node.getName();
+                node.setType(NodeType.GroupBy);
+                node.setParamList(groupByNode.getParamList());
+                dagTree.getSqlTree().add(node);
+            }
+
+            if (sortNode != null) {
+                node = new DagNodeResult();
+                node.setName(getNodeName());
+                node.setPreNode(preNode);
+                preNode = node.getName();
+                node.setType(NodeType.Sort);
+                node.setParamList(groupByNode.getParamList());
+                dagTree.getSqlTree().add(node);
+            }
+
+            node = writerNodes.getOrDefault(statement.intoTableName, new DagNodeResult());
+            node.setName(getNodeName());
+            node.setPreNode(preNode);
+            preNode = node.getName();
+            dagTree.getSqlTree().add(node);
+
+            preNode = lastprenode;
+        }
+    }
+
+    private static void last(DagTree dagTree) {
+        int nums = writerNodes.size();
+        for (Map.Entry<String, DagNodeResult> entry : writerNodes.entrySet()) {
+            DagNodeResult node = new DagNodeResult();
+
+            if (groupByNode != null) {
+                node.setName(getNodeName());
+                node.setPreNode(preNode);
+                preNode = node.getName();
+                node.setType(NodeType.GroupBy);
+                node.setParamList(groupByNode.getParamList());
+                dagTree.getSqlTree().add(node);
+            }
+
+            if (sortNode != null) {
+                node = new DagNodeResult();
+                node.setName(getNodeName());
+                node.setPreNode(preNode);
+                preNode = node.getName();
+                node.setType(NodeType.Sort);
+                node.setParamList(groupByNode.getParamList());
+                dagTree.getSqlTree().add(node);
+            }
+
+            node = entry.getValue();
+            node.setName(getNodeName());
             node.setPreNode(preNode);
             preNode = node.getName();
             dagTree.getSqlTree().add(node);
@@ -127,6 +241,7 @@ public class SqlParserJC {
     }
 
     private static NodeType getNodeType(String name) {
+        name = name.toLowerCase();
         if (name.contains("reader"))
             return NodeType.Reader;
         else if (name.contains("writer"))
@@ -152,6 +267,10 @@ public class SqlParserJC {
         else if (name.contains("crop"))
             return NodeType.Crop;
         else return NodeType.Detection;
+    }
+
+    private static String getNodeName() {
+        return "node" + nodeIndex++;
     }
 
 }

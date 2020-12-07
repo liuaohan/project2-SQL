@@ -1,0 +1,47 @@
+CREATE TABLE reader(
+    cameraId string,
+    timestamps timestamp,
+    rows int,   
+    cols int,
+    type int,
+    data string 
+);
+LOAD reader From 'kafka://false,10.11.1.193:9092,app3test,2097152,500,earliest';
+
+CREATE TABLE writer1(
+    cameraId string,
+    timestamps timestamp,
+    rows int,   
+    cols int,
+    type int,
+    data string 
+);
+LOAD writer1 FROM 'kafka://false,10.11.1.193:9092,2097152,app3output1';
+
+CREATE TABLE writer2(
+    cameraId string,
+    timestamps timestamp,
+    rows int,   
+    cols int,
+    type int,
+    data string 
+);
+LOAD writer2 FROM 'kafka://false,10.11.1.193:9092,2097152,app3output2';
+
+CREATE TEMPORARY TABLE t;
+ 
+select *.makeframe().detection('0').crop()  
+into t
+from reader
+group by cameraId
+sort by timestamps;
+
+select *.fork('cutout_cock').segmentation()
+into writer1
+from t;
+
+select *.fork('locking_plate').classification()
+into writer2
+from t;
+
+ 

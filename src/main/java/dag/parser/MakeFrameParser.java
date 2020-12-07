@@ -40,7 +40,7 @@ public class MakeFrameParser implements IParser {
             String name = matcher.group(1);
             String params = matcher.group(2);
             String preNode = matcher.group(3).split("'")[1];
-            Map<String, Object> paramsMap = SplitSql.parseProp(params);
+            Map<String, String> paramsMap = SplitSql.parsePropString(params);
 
             //((DagNodeResult) res).setName(name);
             //((DagNodeResult) res).setParams(paramsMap);

@@ -28,6 +28,11 @@
 
         </dependency>
 
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.8.0</version>
+        </dependency>
 
 
         <dependency>
@@ -37,38 +42,7 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-            <exclusions>
 
-                <exclusion>
-
-                    <groupId>org.codehaus.janino</groupId>
-
-                    <artifactId>janino</artifactId>
-
-                </exclusion>
-
-                <exclusion>
-
-                    <groupId>org.codehaus.janino</groupId>
-
-                    <artifactId>commons-compiler</artifactId>
-
-                </exclusion>
-
-            </exclusions>
-
-        </dependency>
-
-        <dependency>
-            <groupId>com.aparapi</groupId>
-            <artifactId>aparapi</artifactId>
-            <version>1.9.0</version>
-        </dependency>
 
         <dependency> <!-- Spark dependency -->
             <groupId>org.apache.spark</groupId>
@@ -116,30 +90,6 @@
             <artifactId>spark-streaming_2.11</artifactId>
             <version>2.4.3</version>
             <scope>compile</scope>
-            <exclusions>
-
-                <exclusion>
-
-                    <groupId>org.codehaus.janino</groupId>
-
-                    <artifactId>janino</artifactId>
-
-                </exclusion>
-
-                <exclusion>
-
-                    <groupId>org.codehaus.janino</groupId>
-
-                    <artifactId>commons-compiler</artifactId>
-
-                </exclusion>
-
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql-kafka-0-10_2.11</artifactId>
-            <version>2.4.0</version>
             <exclusions>
 
                 <exclusion>

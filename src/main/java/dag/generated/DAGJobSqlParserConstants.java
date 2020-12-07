@@ -11,57 +11,65 @@ public interface DAGJobSqlParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int CREATE = 5;
+  int CREATE = 6;
   /** RegularExpression Id. */
-  int TABLE = 6;
+  int TABLE = 7;
   /** RegularExpression Id. */
-  int INSERT = 7;
+  int LOAD = 8;
   /** RegularExpression Id. */
-  int INTO = 8;
+  int INSERT = 9;
   /** RegularExpression Id. */
-  int VALUES = 9;
+  int INTO = 10;
   /** RegularExpression Id. */
-  int SELECT = 10;
+  int TEMPORARY = 11;
   /** RegularExpression Id. */
-  int FROM = 11;
+  int VALUES = 12;
   /** RegularExpression Id. */
-  int GROUPBY = 12;
+  int SELECT = 13;
   /** RegularExpression Id. */
-  int SORTBY = 13;
+  int FROM = 14;
   /** RegularExpression Id. */
-  int TYPE = 14;
+  int GROUPBY = 15;
   /** RegularExpression Id. */
-  int INT = 15;
+  int SORTBY = 16;
   /** RegularExpression Id. */
-  int CHAR = 16;
+  int TYPE = 17;
   /** RegularExpression Id. */
-  int ARROW = 17;
+  int INT = 18;
   /** RegularExpression Id. */
-  int COMMA = 18;
+  int CHAR = 19;
   /** RegularExpression Id. */
-  int DOT = 19;
+  int TIMESTAMP = 20;
   /** RegularExpression Id. */
-  int SEMICOLON = 20;
+  int ARROW = 21;
   /** RegularExpression Id. */
-  int LEFT_BRACKET = 21;
+  int COMMA = 22;
   /** RegularExpression Id. */
-  int RIGHT_BRACKET = 22;
+  int DOT = 23;
   /** RegularExpression Id. */
-  int SINGLE_QUOTE = 23;
+  int SEMICOLON = 24;
   /** RegularExpression Id. */
-  int EQUALS = 24;
+  int LEFT_BRACKET = 25;
   /** RegularExpression Id. */
-  int IDENTIFIER = 25;
+  int RIGHT_BRACKET = 26;
   /** RegularExpression Id. */
-  int INTEGER_LITERAL = 26;
+  int SINGLE_QUOTE = 27;
   /** RegularExpression Id. */
-  int LETTER = 27;
+  int EQUALS = 28;
   /** RegularExpression Id. */
-  int DIGIT = 28;
+  int STAR = 29;
   /** RegularExpression Id. */
-  int LEADING_DIGIT = 29;
+  int IDENTIFIER = 30;
   /** RegularExpression Id. */
-  int STRING = 30;
+  int INTEGER_LITERAL = 31;
+  /** RegularExpression Id. */
+  int LETTER = 32;
+  /** RegularExpression Id. */
+  int DIGIT = 33;
+  /** RegularExpression Id. */
+  int LEADING_DIGIT = 34;
+  /** RegularExpression Id. */
+  int STRING = 35;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -73,10 +81,13 @@ public interface DAGJobSqlParserConstants {
     "\"\\t\"",
     "\"\\r\"",
     "\"\\n\"",
+    "<token of kind 5>",
     "\"CREATE\"",
     "\"TABLE\"",
+    "\"LOAD\"",
     "\"INSERT\"",
     "\"INTO\"",
+    "\"CREATE TEMPORARY\"",
     "\"VALUES\"",
     "\"SELECT\"",
     "\"FROM\"",
@@ -84,7 +95,8 @@ public interface DAGJobSqlParserConstants {
     "\"SORT BY\"",
     "<TYPE>",
     "\"INT\"",
-    "\"CHAR\"",
+    "\"STRING\"",
+    "\"TIMESTAMP\"",
     "\"->\"",
     "\",\"",
     "\".\"",
@@ -93,6 +105,7 @@ public interface DAGJobSqlParserConstants {
     "\")\"",
     "\"\\\'\"",
     "\"=\"",
+    "\"*\"",
     "<IDENTIFIER>",
     "<INTEGER_LITERAL>",
     "<LETTER>",

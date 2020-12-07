@@ -17,7 +17,6 @@ public class SparkInSql {
 
     public static void main(String[] args) throws Exception {
 
-
         //第一阶段
         BaseZookeeper zookeeper = new BaseZookeeper();
         zookeeper.connectZookeeper("127.0.0.1:2181");

@@ -54,6 +54,20 @@ public class SplitSql {
         return propMap;
     }
 
+    public static Map<String, String> parsePropString(String propsStr) {
+        String[] strs = propsStr.trim().split("'\\s*,");
+        Map<String, String> propMap = new LinkedHashMap<>();
+        for (int i = 0; i < strs.length; i++) {
+            List<String> ss = SplitSql.splitWithDel(strs[i], '=');
+            if(ss.size()<=0) break;
+            String key = ss.get(0).trim();
+            String value = ss.get(1).trim().replaceAll("'", "").trim();
+            propMap.put(key, value);
+        }
+
+        return propMap;
+    }
+
     //获取appName
     public static String getAppName(String appInfo) {
         List<String> ss = SplitSql.splitWithDel(appInfo.trim(), '=');

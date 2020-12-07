@@ -2,7 +2,6 @@ import dag.parser.DagSqlParser;
 import dag.parser.javacc.SqlParserJC;
 import dag.result.DagNodeResult;
 import dag.result.DagTree;
-import parser.SqlParser;
 import rpc.DAGJob;
 import rpc.Node;
 
@@ -17,7 +16,7 @@ public class SparkDag {
     public static void main(String[] args) {
         StringBuffer sql = new StringBuffer();
         try {
-            File file = new File("E:\\Projects\\StructuredStreaming\\src\\main\\resources\\testDagJobSQL6");
+            File file = new File("E:\\Projects\\StructuredStreaming\\src\\main\\resources\\SQLAPP1.txt");
             FileInputStream fis = new FileInputStream(file);
             BufferedInputStream bis = new BufferedInputStream(fis);
             //自定义缓冲区
@@ -73,7 +72,10 @@ public class SparkDag {
             allNodes.add(node);
             System.out.println("");
         }
-        DAGJob dag = DAGJob.newBuilder().setName(dagTree.getDagResult().getName()).addAllAllNodeList(allNodes).build();
+
+        //DAGJob dag = DAGJob.newBuilder().setName(dagTree.getDagResult().getName()).addAllAllNodeList(allNodes).build();
+        DAGJob dag = DAGJob.newBuilder().addAllAllNodeList(allNodes).build();
+
         return dag;
     }
 }

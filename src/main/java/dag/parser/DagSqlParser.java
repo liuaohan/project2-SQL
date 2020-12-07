@@ -110,9 +110,9 @@ public class DagSqlParser {
             String params = matcher.group(2);
             String preNode = matcher.group(3).split("'")[1];
 
-            Map<String, Object> paramsMap = new HashMap<>();
+            Map<String, String> paramsMap = new HashMap<>();
             if (!isNullOrEmpty(params) && !isNullOrEmpty(params.trim())) {
-                paramsMap = SplitSql.parseProp(params);
+                paramsMap = SplitSql.parsePropString(params);
             }
             res.setName(name);
             res.setParams(paramsMap);

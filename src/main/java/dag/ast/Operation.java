@@ -4,18 +4,12 @@ import java.util.List;
 
 public class Operation {
     public String name;
-    public List<SimpleExpression> valueList;
-
-    public Operation( String name, List<SimpleExpression> valueList){
+    //public List<SimpleExpression> valueList;
+    public ComplexExpression opValue;
+    public Operation( String name, ComplexExpression opValue){
         this.name = name;
-        this.valueList = valueList;
+        this.opValue = opValue;
     }
 
-    @Override
-    public String toString() {
-        return "Property{" +
-                "name='" + name + '\'' +
-                ", type=" + valueList +
-                '}';
-    }
+
 }

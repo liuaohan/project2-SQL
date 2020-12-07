@@ -1,0 +1,33 @@
+CREATE TABLE reader(
+    cameraId string,
+    timestamps timestamp,
+    rows int,   
+    cols int,
+    type int,
+    data string 
+);
+LOAD reader From 'kafka://false,10.11.1.193:9092,EasyPrPart10_test3,2097152,500,earliest';
+
+CREATE TABLE writer(
+    cameraId string,
+    timestamps timestamp,
+    rows int,   
+    cols int,
+    type int,
+    data string
+);
+LOAD writer FROM 'kafka://false,10.11.1.193:9092,2097152,app1output';
+
+CREATE TEMPORARY TABLE t;
+
+select *.makeframe().detection('50051,0') //pipeline
+into t 
+from reader
+group by cameraId
+sort by timestamps;
+
+select *.tracker('2') 
+into writer
+from t;
+
+

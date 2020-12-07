@@ -1,0 +1,37 @@
+CREATE TABLE reader(
+    cameraId string,
+    timestamps timestamp,
+    rows int,   
+    cols int,
+    type int,
+    data string 
+);
+LOAD reader FROM 'kafka://false,10.11.1.193:9092,EasyPrPart1small,2097152,500,earliest';
+
+CREATE TABLE writer(
+    cameraId string,
+    timestamps timestamp,
+    rows int,   
+    cols int,
+    type int,
+    data string 
+);
+LOAD writer FROM 'kafka://false,10.11.1.193:9092,2097152,app2output';
+
+
+CREATE TEMPORARY TABLE t;
+ 
+select *.makeframe() 
+into t
+from reader
+group by cameraId 
+sort by timestamps;
+
+select *.LPR()
+into writer
+from t;
+
+
+
+
+

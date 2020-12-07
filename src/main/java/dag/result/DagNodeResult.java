@@ -8,9 +8,9 @@ import java.util.Map;
 public class DagNodeResult implements IResult {
     private String name;
 
-    private Map<String, Object> params;
+    private Map<String, String> params;
 
-    private List<Object> paramList;
+    private List<String> paramList;
 
     private String preNode;
 
@@ -32,11 +32,11 @@ public class DagNodeResult implements IResult {
         this.name = name;
     }
 
-    public Map<String, Object> getParams() {
+    public Map<String, String> getParams() {
         return params;
     }
 
-    public void setParams(Map<String, Object> params) {
+    public void setParams(Map<String, String> params) {
         this.params = params;
     }
 
@@ -49,11 +49,11 @@ public class DagNodeResult implements IResult {
     }
 
 
-    public List<Object> getParamList() {
+    public List<String> getParamList() {
         return paramList;
     }
 
-    public void setParamList(List<Object> paramList) {
+    public void setParamList(List<String> paramList) {
         this.paramList = paramList;
     }
 }
